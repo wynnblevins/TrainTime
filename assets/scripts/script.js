@@ -8,24 +8,39 @@ var config = {
 };
 firebase.initializeApp(config);
 
+var trains = [
+    {name: 'Santa Fe', destination: 'Phoenix Arizona', frequency: 60, next: null, minutesAway: null},
+    {name: 'Benjamin Britten', destination: 'Liverpool', frequency: 80, next: null, minutesAway: null},
+    {name: 'Danube Express', destination: 'Budapest', frequency: 30, next: null, minutesAway: null},
+    {name: 'Allersberg Express', destination: 'Allersburg', frequency: 20, next: null, minutesAway: null},
+    {name: 'Sibirjak', destination: 'Berlin', frequency: 10, next: null, minutesAway: null},
+    {name: 'Polar Express', destination: 'North Pole', frequency: 100, next: null, minutesAway: null},
+    {name: 'Rheingold Express', destination: 'Amsterdam', frequency: 50, next: null, minutesAway: null},
+    {name: 'Vindobona', destination: 'Hamburg', frequency: 15, next: null, minutesAway: null},
+    {name: 'Bernina Express', destination: ' St. Moritz', frequency: 17, next: null, minutesAway: null},
+    {name: 'Gottardo', destination: 'Milan', frequency: 120, next: null, minutesAway: null}
+];
+
 $("#add-train-button").click(function () {
-    console.log('Hello, World!');
+    var trainName = $('#trainName').val();
+    var destination = $('#destination').val();
+    var firstTrainTime = $('#firstTrainTime').val();
+    var frequency = $('#frequency').val();
+    var dummyVal = '';
+    
+    var trainRowHtml = `<tr>
+        <td>${trainName}</td>
+        <td>${destination}</td>
+        <td>${frequency}</td>
+        <td>${dummyVal}</td>
+        <td>${dummyVal}</td>
+    </tr>`;
+
+    $('#train-list-table tbody').append(trainRowHtml)
 });
 
 function init() {
-    var trains = [
-        {name: 'Santa Fe', destination: 'Phoenix Arizona', frequency: 60, next: null, minutesAway: null},
-        {name: 'Benjamin Britten', destination: 'Liverpool', frequency: 80, next: null, minutesAway: null},
-        {name: 'Danube Express', destination: 'Budapest', frequency: 30, next: null, minutesAway: null},
-        {name: 'Allersberg Express', destination: 'Allersburg', frequency: 20, next: null, minutesAway: null},
-        {name: 'Sibirjak', destination: 'Berlin', frequency: 10, next: null, minutesAway: null},
-        {name: 'Polar Express', destination: 'North Pole', frequency: 100, next: null, minutesAway: null},
-        {name: 'Rheingold Express', destination: 'Amsterdam', frequency: 50, next: null, minutesAway: null},
-        {name: 'Vindobona', destination: 'Hamburg', frequency: 15, next: null, minutesAway: null},
-        {name: 'Bernina Express', destination: ' St. Moritz', frequency: 17, next: null, minutesAway: null},
-        {name: 'Gottardo', destination: 'Milan', frequency: 120, next: null, minutesAway: null}
-    ];
-
+    
     var html = '';
     for(var i = 0; i < trains.length; i++) {
         html += `<tr>
