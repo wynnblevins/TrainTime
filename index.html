@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Train Time</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="container">
+    <div id="train-time-jumbotron" class="jumbotron">
+        <h1 class="jumbotron-text">Anytime is Train Time</h1>
+        <h2 class="jumbotron-text">Chee Choo. Chee Chee</h2>
+    </div>
+    
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Current Train Schedule</h3>
+            <div class="pull-right">
+                <span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+                    <i class="glyphicon glyphicon-filter"></i>
+                </span>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover" id="dev-table">
+                <thead>
+                    <tr>
+                        <th>Train Name</th>
+                        <th>Destination</th>
+                        <th>Frequency (min)</th>
+                        <th>Next Arrival</th>
+                        <th>Minutes Away</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Kilgore</td>
+                        <td>Trout</td>
+                        <td>kilgore</td>
+                        <td>Whatever</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Kilgore</td>
+                        <td>Trout</td>
+                        <td>kilgore</td>
+                        <td>Whatever</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Kilgore</td>
+                        <td>Trout</td>
+                        <td>kilgore</td>
+                        <td>Whatever</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Add Train</h3>
+            <div class="pull-right">
+                <span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+                    <i class="glyphicon glyphicon-filter"></i>
+                </span>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form>
+                <div class="form-group">
+                    <label for="trainTime" class="control-label">Train Time</label> 
+                    <input id="trainTime" name="trainTime" type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="destination" class="control-label">Destination</label> 
+                    <input id="destination" name="destination" type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="firstTrainTime" class="control-label">First Train Time (HH:mm - military time)</label> 
+                    <input id="firstTrainTime" name="firstTrainTime" type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="frequency" class="control-label">Frequency (min)</label> 
+                    <input id="frequency" name="frequency" type="text" class="form-control">
+                </div> 
+                <div class="form-group">
+                    <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+</body>
+</html>
