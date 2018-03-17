@@ -9,9 +9,29 @@ var config = {
 };
 firebase.initializeApp(config);
 
+function getMinutesAway(firstTime) {
+    console.log(firstTime);
+    console.log("firstTime: " + firstTime);
+    console.log("tFrequency: " + firstTime.frequency);
+
+    var firstTimeConverted = moment(firstTime.lastArrival, "HH:mm").subtract(1, "years");
+    console.log("Converted: " + firstTimeConverted);
+
+    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    var tRemainder = diffTime % firstTime.frequency;
+    console.log(tRemainder);
+
+    var tMinutesTillTrain = firstTime.frequency - tRemainder;
+    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+    return tMinutesTillTrain;
+}
+
 function onOneMinutePass() {
     console.log('One minute has passed.');
-    calculateTimeRemaining();
+    updateTrainRecord();
 }
 
 function onTenSecondsPass() {
@@ -21,9 +41,9 @@ function onTenSecondsPass() {
 $("#add-train-button").click(function () {
     var trainName = $('#trainName').val();
     var destination = $('#destination').val();
-    var firstTrainTime = $('#firstTrainTime').val();  // needs to be military time per instructions
+    var firstTrainTime = moment($('#firstTrainTime').val()).format('HH:mm a'); // needs to be military time per instructions
+    console.log(firstTrainTime);
     var frequency = $('#frequency').val();
-    var dummyVal = '';
     
     var trainRowHtml = `<tr>
         <td>${trainName}</td>
@@ -49,8 +69,13 @@ function getNextArrival(frequency) {
     return moment(nextArrival).format(' h:mm a'); 
 }
 
-function getMinutesAway() {
+function updateTrainRecord(trainObj, trainNdx) {
+    // set database record for train's arrival time to 
+    // value returned from getNextArrival
+    trainObj.lastArrival = moment().format('h:mm a');
+    trainObj.getNextArrival(trainObj.frequency);
 
+    firebase.database().ref('trains/' + trainNdx);
 }
 
 function init() {
@@ -61,12 +86,18 @@ function init() {
         // build table
         var html = '';
         for(var key in trainsDb.trains) {
+            console.log(trainsDb.trains[key]);
+            
+            var remainingMinutes = getMinutesAway(trainsDb.trains[key]);
+            
+            var nextArrival = getNextArrival(trainsDb.trains[key].frequency);
+            console.log(nextArrival);
             html += `<tr>
                 <td>${trainsDb.trains[key].name}</td>
                 <td>${trainsDb.trains[key].destination}</td>
                 <td>${trainsDb.trains[key].frequency}</td>
                 <td>${getNextArrival(trainsDb.trains[key].frequency)}</td>
-                <td>${getMinutesAway(trainsDb.trains[key].minutesAway)}</td>
+                <td>${remainingMinutes}</td>
             </tr>`;
         }    
         $('#train-list-table tbody').append(html);
