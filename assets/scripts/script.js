@@ -45,8 +45,12 @@ $("#add-train-button").click(function () {
 });
 
 function getNextArrival(frequency) {
-    nextArrival = moment().add(5, 'minutes');
+    var nextArrival = moment().add(frequency, 'minutes');
     return moment(nextArrival).format(' h:mm a'); 
+}
+
+function getMinutesAway() {
+
 }
 
 function init() {
@@ -62,7 +66,7 @@ function init() {
                 <td>${trainsDb.trains[key].destination}</td>
                 <td>${trainsDb.trains[key].frequency}</td>
                 <td>${getNextArrival(trainsDb.trains[key].frequency)}</td>
-                <td>${trainsDb.trains[key].minutesAway}</td>
+                <td>${getMinutesAway(trainsDb.trains[key].minutesAway)}</td>
             </tr>`;
         }    
         $('#train-list-table tbody').append(html);
