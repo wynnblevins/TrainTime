@@ -9,6 +9,15 @@ var config = {
 };
 firebase.initializeApp(config);
 
+function onOneMinutePass() {
+    console.log('One minute has passed.');
+    calculateTimeRemaining();
+}
+
+function onTenSecondsPass() {
+    console.log('Ten seconds have passed.');
+}
+
 $("#add-train-button").click(function () {
     var trainName = $('#trainName').val();
     var destination = $('#destination').val();
@@ -35,11 +44,15 @@ $("#add-train-button").click(function () {
     $('#train-list-table tbody').append(trainRowHtml);
 });
 
+function getNextArrival(frequency) {
+    nextArrival = moment().add(5, 'minutes');
+    return moment(nextArrival).format(' h:mm a'); 
+}
+
 function init() {
     // load data from db, put in trains array
     firebase.database().ref().once('value').then(function (snapshot) {
         var trainsDb = snapshot.val();
-        trainsCount = trainsDb.trains.length;
 
         // build table
         var html = '';
@@ -48,12 +61,20 @@ function init() {
                 <td>${trainsDb.trains[key].name}</td>
                 <td>${trainsDb.trains[key].destination}</td>
                 <td>${trainsDb.trains[key].frequency}</td>
-                <td>${trainsDb.trains[key].next}</td>
+                <td>${getNextArrival(trainsDb.trains[key].frequency)}</td>
                 <td>${trainsDb.trains[key].minutesAway}</td>
             </tr>`;
         }    
         $('#train-list-table tbody').append(html);
     });
+
+    setInterval(function () {
+        onTenSecondsPass();
+    }, 10 * 1000);
+
+    setInterval(function () {
+        onOneMinutePass();
+    }, 60 * 1000);
 }
 
 init();
