@@ -1,5 +1,5 @@
-var trains = [];
 var $trainListTable = $('#train-list-table > tbody');
+var trains = [];
 var config = {
     apiKey: "AIzaSyAptp0lxGeq1hLjLq5BuHVPJjH4ps3pqt0",
     authDomain: "traintime-d1d8c.firebaseapp.com",
@@ -31,39 +31,48 @@ function calculateMinutesUntilTrain(firstArrivalTime, tFrequency) {
     return tMinutesTillTrain;
 }
 
+function buildTrainsTable(trains) {
+    var html = '';
+    
+    // build the trains table with data from trains array
+    for (var train in trains) {
+        // put frequency value from database in variable to help with readability
+        var trainFrequency = trains[train].frequency;
+
+        // use frequency on load because we are use in relative times (per instrutions)
+        var nextArrival = calculateNextArrival(trainFrequency);
+        
+        // calculate minutes away for each train
+        var minutesAway = calculateMinutesUntilTrain(nextArrival, trainFrequency)
+
+        // build row
+        var trainListRow = `<tr>
+            <td>${trains[train].name}</td>
+            <td>${trains[train].destination}</td>
+            <td>${trainFrequency}</td>
+            <td>${moment(nextArrival).format('h:mm a')}</td>
+            <td>${minutesAway}</td>
+            <td><button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></td>
+        </tr>`;
+
+        html += trainListRow;
+    }    
+
+    return html;
+}
+
 function init() {
     firebase.database().ref().once('value').then(function (snapshot) {
-        // html variable that will represent our trains table, will be appended to screen
-        var html = '';
-        
         // put retrieved trains inside of trains variable 
         trains = snapshot.val().trains;
 
-        // build the trains table with data from trains array
-        for (var i = 0; i < trains.length; i++) {
-            // put frequency value from database in variable to help with readability
-            var trainFrequency = trains[i].frequency;
-
-            // use frequency on load because we are use in relative times (per instrutions)
-            var nextArrival = calculateNextArrival(trainFrequency);
-            
-            // calculate minutes away for each train
-            var minutesAway = calculateMinutesUntilTrain(nextArrival, trainFrequency)
-
-            // build row
-            var trainListRow = `<tr>
-                <td>${trains[i].name}</td>
-                <td>${trains[i].destination}</td>
-                <td>${trainFrequency}</td>
-                <td>${moment(nextArrival).format('h:mm a')}</td>
-                <td>${minutesAway}</td>
-                <td><button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></td>
-            </tr>`;
-
-            html += trainListRow;
-        }
+        var html = buildTrainsTable(trains);
 
         // append newly built html to screen
+        $trainListTable.append(html);
+
+        $trainListTable.empty();
+        var html = buildTrainsTable(trains);
         $trainListTable.append(html);
     });
 }
@@ -76,10 +85,15 @@ $("#add-train-button").click(function () {
     var destination = $('#destination').val();
     var trainName = $('#trainName').val();
 
-    console.log(frequency);
-    console.log(firstTrainTime);
-    console.log(destination);
-    console.log(trainName);
+    firebase.database().ref('/trains').push({
+        name: trainName,
+        destination: destination,
+        frequency: parseInt(frequency),
+        lastArrival: firstTrainTime,
+    });
+    
+    // refresh the trains table
+    init();
 });
 
 init();
