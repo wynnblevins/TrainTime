@@ -1,4 +1,5 @@
-var trainsCount = null;
+var trains = [];
+var $trainListTable = $('#train-list-table > tbody');
 var config = {
     apiKey: "AIzaSyAptp0lxGeq1hLjLq5BuHVPJjH4ps3pqt0",
     authDomain: "traintime-d1d8c.firebaseapp.com",
@@ -9,100 +10,63 @@ var config = {
 };
 firebase.initializeApp(config);
 
-function getMinutesAway(firstTime) {
-    var firstTimeConverted = moment(firstTime.lastArrival, "HH:mm").subtract(1, "years");
+function calculateNextArrival(tMinutesTillTrain) {
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+    return nextTrain;
+}
+
+function calculateMinutesUntilTrain(firstArrivalTime, tFrequency) {
+    // get first arrival time from moment 
+    var firstTimeConverted = moment(firstArrivalTime, "HH:mm").subtract(1, "years");
+    
+    // calculate difference between the times
     var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    var tRemainder = diffTime % firstTime.frequency;
-    var tMinutesTillTrain = firstTime.frequency - tRemainder;
+
+    // calculate time apart (remainder)
+    var tRemainder = diffTime % tFrequency;
+
+    // calculate minutes until train
+    var tMinutesTillTrain = tFrequency - tRemainder;
+
     return tMinutesTillTrain;
 }
 
-function onOneMinutePass(trainObj, trainNdx) {
-    updateTrainRecord(trainObj, trainNdx);
-}
-
-function onTrainArrival(trainObj, trainNdx) {
-    var minutesAway = getMinutesAway(trainObj);
-}
-
 $("#add-train-button").click(function () {
-    var trainName = $('#trainName').val();
-    var destination = $('#destination').val();
-    var firstTrainTime = moment('HH:mm').format('HH:mm');
-    var frequency = $('#frequency').val();
-    
-    // initially frequency will be same as minutes
-    var trainRowHtml = `<tr>
-        <td>${trainName}</td>
-        <td>${destination}</td>
-        <td>${frequency}</td>
-        <td>${firstTrainTime}</td>
-        <td>${frequency}</td>  
-    </tr>`;
 
-    firebase.database().ref('trains/' + trainsCount).set({
-        name: trainName,
-        destination: destination,
-        frequency: parseInt(frequency),
-        lastArrival: firstTrainTime,
-    });
-
-    $('#train-list-table tbody').append(trainRowHtml);
 });
 
-function getNextArrival(frequency) {
-    var nextArrival = moment().add(frequency, 'minutes');
-    return moment(nextArrival).format('h:mm a'); 
-}
-
-function updateTrainRecord(trainObj, trainNdx) {
-    firebase.database().ref('trains/' + trainNdx);
-
-    var $tableRows = $('#train-list-table > tbody > tr');
-    for (var i = 0; i < $tableRows.length; i++) {
-        var $td = $('#train-list-table > tbody > tr').eq(i).find('td').eq(4);
-        var currValue = parseInt($td.text()) - 1;
-
-        // if train hasnt arrived
-        if (currValue > 0) {
-            $td.text(currValue);
-        } else {  // else train has arrived
-            var $frequencyCell = $('#train-list-table > tbody > tr').eq(i).find('td').eq(2);
-            $td.text($frequencyCell.text());
-        } 
-    }
-}
-var remainingMinutes = null;
 function init() {
-    // load data from db, put in trains array
     firebase.database().ref().once('value').then(function (snapshot) {
-        var trainsDb = snapshot.val();
-        trainsCount = trainsDb.trains.length;
-
-        setInterval(function () {
-            onOneMinutePass(trainsDb.trains, key);
-        }, 60 * 1000);
-
-        // build table
+        // html variable that will represent our trains table, will be appended to screen
         var html = '';
-        for(var key in trainsDb.trains) {        
+        
+        // put retrieved trains inside of trains variable 
+        trains = snapshot.val().trains;
+
+        // build the trains table with data from trains array
+        for (var i = 0; i < trains.length; i++) {
+            // put frequency value from database in variable to help with readability
+            var trainFrequency = trains[i].frequency;
+
+            // use frequency on load because we are use in relative times (per instrutions)
+            var nextArrival = calculateNextArrival(trainFrequency);
             
+            // calculate minutes away for each train
+            var minutesAway = calculateMinutesUntilTrain(nextArrival, trainFrequency)
 
-            remainingMinutes = getMinutesAway(trainsDb.trains[key]);
-            if (remainingMinutes === 0) {
-                updateTrainRecord(trainsDb.trains[key], key);
-            }
-            var nextArrival = getNextArrival(trainsDb.trains[key].frequency);
-
-            html += `<tr>
-                <td>${trainsDb.trains[key].name}</td>
-                <td>${trainsDb.trains[key].destination}</td>
-                <td>${trainsDb.trains[key].frequency}</td>
-                <td>${getNextArrival(trainsDb.trains[key].frequency)}</td>
-                <td>${remainingMinutes}</td>
+            var trainListRow = `<tr>
+                <td>${trains[i].name}</td>
+                <td>${trains[i].destination}</td>
+                <td>${trainFrequency}</td>
+                <td>${moment(nextArrival).format('h:mm a')}</td>
+                <td>${minutesAway}</td>
+                <td><button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></td>
             </tr>`;
-        }    
-        $('#train-list-table tbody').append(html);
+
+            html += trainListRow;
+        }
+
+        $trainListTable.append(html);
     });
 }
 
