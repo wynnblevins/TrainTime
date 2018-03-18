@@ -31,10 +31,6 @@ function calculateMinutesUntilTrain(firstArrivalTime, tFrequency) {
     return tMinutesTillTrain;
 }
 
-$("#add-train-button").click(function () {
-
-});
-
 function init() {
     firebase.database().ref().once('value').then(function (snapshot) {
         // html variable that will represent our trains table, will be appended to screen
@@ -54,6 +50,7 @@ function init() {
             // calculate minutes away for each train
             var minutesAway = calculateMinutesUntilTrain(nextArrival, trainFrequency)
 
+            // build row
             var trainListRow = `<tr>
                 <td>${trains[i].name}</td>
                 <td>${trains[i].destination}</td>
@@ -66,8 +63,23 @@ function init() {
             html += trainListRow;
         }
 
+        // append newly built html to screen
         $trainListTable.append(html);
     });
 }
+
+// add train button click handler
+$("#add-train-button").click(function () {
+    // get text field values
+    var frequency = $('#frequency').val();
+    var firstTrainTime = $('#firstTrainTime').val();
+    var destination = $('#destination').val();
+    var trainName = $('#trainName').val();
+
+    console.log(frequency);
+    console.log(firstTrainTime);
+    console.log(destination);
+    console.log(trainName);
+});
 
 init();
